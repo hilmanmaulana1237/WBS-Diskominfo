@@ -1,0 +1,69 @@
+/* EMERGENCY FIX - Add this at the END of style.css if still have issues */
+
+/* Force enable scroll and click everywhere */
+* {
+    pointer-events: auto !important;
+}
+
+/* Only these should be non-clickable */
+body::before,
+.ripple-effect,
+.scroll-progress,
+.hero-overlay,
+.particles-bg {
+    pointer-events: none !important;
+}
+
+/* Force scroll capability */
+html {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+}
+
+body {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+/* Remove any blocking overlays */
+.modal-backdrop {
+    display: none !important;
+}
+
+/* Ensure all sections are visible and clickable */
+section, div, main, article {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Reset any problematic animations */
+.fade-in-up,
+.fade-in-left,
+.fade-in-right,
+.scale-in {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+/* Reset z-index hierarchy */
+.navbar {
+    z-index: 1030 !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+.scroll-progress {
+    z-index: 9999 !important;
+    pointer-events: none !important;
+}
+
+/* Everything else should have normal z-index */
+section, div, main {
+    z-index: auto !important;
+}

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBS - Whistle Blowing System | Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/index.html">
+                 <img src="assets/logo.jpg" alt="Logo WBS Diskominfo" class="logo" style="height: 50px;"> WBS Diskominfo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="/index.html">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#kriteria-laporan">Kriteria Laporan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#alur-pelaporan">Alur Pelaporan</a>
+                    </li>
+                    <li class="nav-item" id="loginNav">
+                        <a class="nav-link" href="/login.html">Login</a>
+                    </li>
+                    <li class="nav-item" id="registerNav">
+                        <a class="nav-link" href="/register.html">Daftar</a>
+                    </li>
+                    <li class="nav-item d-none" id="dashboardNav">
+                        <a class="nav-link" href="#" id="dashboardLink">Dashboard</a>
+                    </li>
+                    <li class="nav-item d-none" id="logoutNav">
+                        <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Whistleblowing System<br>
+                    <span class="highlight">Diskominfo</span>
+                </h1>
+                <p class="hero-description">
+                    Laporkan dugaan pelanggaran dengan aman dan rahasia. Bersama kita wujudkan pemerintahan yang bersih, transparan, dan akuntabel.
+                </p>
+                <div class="hero-buttons" id="heroButtons">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+        <div class="hero-bg">
+            <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#64d9ff;stop-opacity:0.2" />
+                        <stop offset="100%" style="stop-color:#2d7dd8;stop-opacity:0.1" />
+                    </linearGradient>
+                </defs>
+                <path d="M 0 300 Q 300 100 600 300 T 1200 300 L 1200 600 L 0 600 Z" fill="url(#grad1)"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="py-5" style="background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center mb-4">
+                    <h2 style="color: white;">Tentang Whistle Blowing System</h2>
+                    <p class="lead" style="color: white;">Sistem pelaporan pelanggaran yang aman dan terpercaya</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-shield-lock" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <h4 class="mt-3">Aman & Rahasia</h4>
+                            <p>Identitas pelapor dijamin kerahasiaannya sesuai peraturan yang berlaku</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-clock-history" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <h4 class="mt-3">Proses Cepat</h4>
+                            <p>Setiap laporan akan ditindaklanjuti dengan cepat dan profesional</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-eye" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <h4 class="mt-3">Transparan</h4>
+                            <p>Pantau status laporan Anda secara real-time melalui dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Criteria Section -->
+<section id="kriteria-laporan" class="py-5 bg-white">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center mb-4">
+        <h2>Kriteria Laporan</h2>
+        <p class="lead">
+          Data yang Anda kirimkan akan kami tindaklanjuti, apabila memenuhi beberapa unsur berikut :
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Criteria Card 1 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">What (Apa)</h5>
+              <p class="card-text">
+                Perbuatan berindikasi pelanggaran yang disampaikan oleh Pelapor
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criteria Card 2 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">Where (Dimana)</h5>
+              <p class="card-text">
+                Dimana perbuatan tersebut dilakukan
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criteria Card 3 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">When (Kapan)</h5>
+              <p class="card-text">
+                Kapan perbuatan tersebut dilakukan
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criteria Card 4 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">Who (Siapa)</h5>
+              <p class="card-text">
+                Siapa saja yang terlibat dalam perbuatan tersebut
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criteria Card 5 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">How (Bagaimana)</h5>
+              <p class="card-text">
+                Bagaimana perbuatan tersebut dilakukan (modus, cara, dsb)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Criteria Card 6 -->
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex align-items-start">
+            <div class="criteria-icon me-3">
+              <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--primary-color);"></i>
+            </div>
+            <div>
+              <h5 class="card-title">Why (Mengapa)</h5>
+              <p class="card-text">
+                Alasan atau motif mengapa perbuatan tersebut dilakukan
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Flow Section -->
+<section id="alur-pelaporan" class="py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center mb-5">
+        <h2>Alur Pelaporan</h2>
+        <p class="lead">Proses pelaporan yang mudah dan transparan</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Step 1 -->
+      <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-person-plus-fill mb-3" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h5 class="card-title">Daftar/Login</h5>
+            <p class="card-text">Buat akun atau masuk ke sistem</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-file-earmark-text-fill mb-3" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h5 class="card-title">Buat Laporan</h5>
+            <p class="card-text">Isi formulir laporan dengan lengkap</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-search mb-3" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h5 class="card-title">Verifikasi</h5>
+            <p class="card-text">Tim kami akan memverifikasi laporan</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="col-md-3 mb-4">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-check-circle-fill mb-3" style="font-size: 3rem; color: var(--primary-color);"></i>
+            <h5 class="card-title">Tindak Lanjut</h5>
+            <p class="card-text">Laporan akan ditindaklanjuti</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <!-- Analytics Section -->
+    <section class="analytics" style="padding: 4rem 2rem; background: #f8f9fa;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+            <!-- Header dengan background biru -->
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); padding: 1.5rem 2rem; border-radius: 12px 12px 0 0; margin-bottom: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0; color: white; font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="bi bi-bar-chart-fill"></i> Grafik Laporan
+                </h2>
+            </div>
+
+            <!-- Content Area -->
+            <div style="background: white; padding: 2.5rem; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem;">
+                    <!-- Status Chart -->
+                    <div>
+                        <h3 style="margin-bottom: 1.5rem; color: #1e293b; font-size: 1rem; font-weight: 600;">
+                            Laporan Berdasarkan Status
+                        </h3>
+                        <div style="max-width: 350px; margin: 0 auto;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Jenis Chart -->
+                    <div>
+                        <h3 style="margin-bottom: 1.5rem; color: #1e293b; font-size: 1rem; font-weight: 600;">
+                            Laporan Berdasarkan Jenis
+                        </h3>
+                        <div>
+                            <canvas id="jenisChart" style="max-height: 350px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 WBS Diskominfo. Semua hak dilindungi.</p>
+            <p>Hubungi kami: <a href="mailto:wbs@diskominfo.go.id" class="text-white">wbs@diskominfo.go.id</a></p>
+        </div>
+    </footer>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication and display appropriate buttons
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            const heroButtons = document.getElementById('heroButtons');
+            const loginNav = document.getElementById('loginNav');
+            const registerNav = document.getElementById('registerNav');
+            const dashboardNav = document.getElementById('dashboardNav');
+            const logoutNav = document.getElementById('logoutNav');
+            const dashboardLink = document.getElementById('dashboardLink');
+
+            if (token && user.role) {
+                // User is logged in
+                loginNav?.classList.add('d-none');
+                registerNav?.classList.add('d-none');
+                dashboardNav?.classList.remove('d-none');
+                logoutNav?.classList.remove('d-none');
+
+                // Set dashboard link based on role
+                if (user.role === 'admin') {
+                    dashboardLink.href = '/admin-dashboard.html';
+                } else {
+                    dashboardLink.href = '/user-dashboard.html';
+                }
+
+                // Hero buttons for logged in users
+                heroButtons.innerHTML = `
+                    <a href="/user-create-report.html" class="btn btn-primary btn-lg">
+                        <i class="bi bi-file-text"></i> Buat Laporan Baru
+                    </a>
+                    <a href="${user.role === 'admin' ? '/admin-dashboard.html' : '/user-dashboard.html'}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-graph-up"></i> Lihat Dashboard
+                    </a>
+                `;
+            } else {
+                // User is not logged in
+                loginNav?.classList.remove('d-none');
+                registerNav?.classList.remove('d-none');
+                dashboardNav?.classList.add('d-none');
+                logoutNav?.classList.add('d-none');
+
+                // Hero buttons for guests
+                heroButtons.innerHTML = `
+                    <a href="/register.html" class="btn btn-primary btn-lg">
+                        <i class="bi bi-pencil-square"></i> Buat Laporan
+                    </a>
+                    <a href="#alur-pelaporan" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-down"></i> Cek Status Laporan
+                    </a>
+                `;
+            }
+        }
+
+        // Logout handler
+        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        });
+
+        // Load chart data
+        async function loadChartData() {
+            try {
+                const response = await fetch('/api/reports/public/stats');
+                
+                if (!response.ok) {
+                    console.log('No chart data available');
+                    return;
+                }
+                
+                const data = await response.json();
+
+                // Plugin to display text in center of doughnut chart
+                const centerTextPlugin = {
+                    id: 'centerText',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, chartArea: { width, height } } = chart;
+                        ctx.save();
+
+                        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+
+                        // Draw number
+                        ctx.font = 'bold 48px Arial';
+                        ctx.fillStyle = '#1e293b';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(total, width / 2, height / 2 - 10);
+
+                        // Draw label
+                        ctx.font = '14px Arial';
+                        ctx.fillStyle = '#64748b';
+                        ctx.fillText('Total', width / 2, height / 2 + 25);
+
+                        ctx.restore();
+                    }
+                };
+
+                // Status Chart (Doughnut)
+                const statusCanvas = document.getElementById('statusChart');
+                if (statusCanvas && data.byStatus && data.byStatus.length > 0) {
+                    const statusLabels = data.byStatus.map(item => item.label);
+                    const statusValues = data.byStatus.map(item => item.count);
+                    
+                    new Chart(statusCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: statusLabels,
+                            datasets: [{
+                                data: statusValues,
+                                backgroundColor: '#0066cc',
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        font: { size: 12, family: "'Inter', sans-serif" }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / total) * 100).toFixed(2);
+                                            return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [centerTextPlugin]
+                    });
+                }
+
+                // Jenis Chart (Bar)
+                const jenisCanvas = document.getElementById('jenisChart');
+                if (jenisCanvas && data.byJenis && data.byJenis.length > 0) {
+                    const jenisLabels = data.byJenis.map(item => item.jenis_laporan);
+                    const jenisValues = data.byJenis.map(item => item.count);
+                    
+                    new Chart(jenisCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: jenisLabels,
+                            datasets: [{
+                                label: 'Jumlah Laporan',
+                                data: jenisValues,
+                                backgroundColor: ['#6366f1', '#f97316'],
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Total: ' + context.parsed.y + ' laporan';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: '#f1f5f9' },
+                                    ticks: {
+                                        stepSize: 1,
+                                        font: { size: 10 }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10 } }
+                                }
+                            }
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error loading charts:', error);
+            }
+        }
+
+        // Initialize on page load
+        checkAuth();
+        loadChartData();
+    </script>
+</body>
+</html>

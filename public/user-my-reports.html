@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Saya - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Dashboard Wrapper -->
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo.jpg" alt="Logo" onerror="this.style.display='none'">
+                <h3>WBS User</h3>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-label">Main Menu</div>
+                <a href="/user-dashboard.html" class="menu-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/user-create-report.html" class="menu-item">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    <span>Buat Laporan</span>
+                </a>
+                <a href="/user-my-reports.html" class="menu-item active">
+                    <i class="bi bi-list-ul"></i>
+                    <span>Laporan Saya</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <div class="menu-label">Account</div>
+                <a href="#" class="menu-item" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h2><i class="bi bi-list-ul"></i> Laporan Saya</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName" style="display: none;"></span>
+                    <a href="/user-create-report.html" class="btn btn-sm btn-primary ms-3">
+                        <i class="bi bi-plus-circle"></i> Buat Laporan
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="main-content-inner">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-muted mb-4">Daftar seluruh laporan yang telah Anda buat</p>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Laporan</h5>
+                            </div>
+                            <div class="card-body p-3">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-lg-3 col-md-4">
+                                    <label class="form-label small mb-1 fw-semibold">Status</label>
+                                    <select class="form-select" id="filterStatus" style="height: 38px;">
+                                        <option value="">Semua Status</option>
+                                        <option value="pending">Menunggu</option>
+                                        <option value="diterima">Diterima</option>
+                                        <option value="diproses">Diproses</option>
+                                        <option value="selesai">Selesai</option>
+                                        <option value="ditolak">Ditolak</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-md-4">
+                                    <label class="form-label small mb-1 fw-semibold">Jenis</label>
+                                    <select class="form-select" id="filterJenis" style="height: 38px;">
+                                        <option value="">Semua Jenis</option>
+                                        <option value="aduan">Aduan</option>
+                                        <option value="saran">Saran</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-4">
+                                    <label class="form-label small mb-1 fw-semibold">Tanggal Mulai</label>
+                                    <input type="date" class="form-control" id="filterStartDate" style="height: 38px;">
+                                </div>
+                                <div class="col-lg-2 col-md-4">
+                                    <label class="form-label small mb-1 fw-semibold">Tanggal Akhir</label>
+                                    <input type="date" class="form-control" id="filterEndDate" style="height: 38px;">
+                                </div>
+                                <div class="col-lg-2 col-md-4">
+                                    <button class="btn btn-primary w-100" onclick="applyFilters()" style="height: 38px;">
+                                        <i class="bi bi-filter"></i> Terapkan
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <button class="btn btn-secondary btn-sm" onclick="resetFilters()">
+                                        <i class="bi bi-arrow-clockwise"></i> Reset Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports List -->
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-file-text"></i> Daftar Laporan</h5>
+                            </div>
+                            <div class="card-body p-3">
+                                <div id="reportsContainer">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary"></div>
+                                        <p class="mt-2">Memuat data laporan...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer mt-5">
+                <div class="container-fluid">
+                    <p class="mb-0">&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        if (user.role === 'admin') {
+            window.location.href = '/admin-dashboard.html';
+        }
+
+        // Display user info
+        const userNameEl = document.getElementById('userName');
+        const userAvatarEl = document.getElementById('userAvatar');
+        if (userNameEl && user.name) {
+            userNameEl.textContent = user.name;
+            userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Load all reports
+        async function loadReports() {
+            try {
+                const container = document.getElementById('reportsContainer');
+                container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Memuat data laporan...</p></div>';
+
+                const data = await apiCall('/reports/my-reports');
+                let reports = data.reports;
+
+                // Apply filters
+                const statusFilter = document.getElementById('filterStatus').value;
+                const jenisFilter = document.getElementById('filterJenis').value;
+                const startDate = document.getElementById('filterStartDate').value;
+                const endDate = document.getElementById('filterEndDate').value;
+
+                if (statusFilter) {
+                    reports = reports.filter(r => r.status === statusFilter);
+                }
+
+                if (jenisFilter) {
+                    reports = reports.filter(r => r.jenis_laporan === jenisFilter);
+                }
+
+                if (startDate && endDate) {
+                    reports = reports.filter(r => {
+                        const reportDate = new Date(r.date);
+                        return reportDate >= new Date(startDate) && reportDate <= new Date(endDate);
+                    });
+                }
+                
+                if (reports.length === 0) {
+                    container.innerHTML = '<div class="text-center py-5"><i class="bi bi-inbox" style="font-size: 48px; color: #ccc;"></i><p class="text-muted mt-3">Tidak ada laporan yang sesuai dengan filter</p><a href="/user-create-report.html" class="btn btn-primary mt-2"><i class="bi bi-plus-circle"></i> Buat Laporan Baru</a></div>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-hover table-bordered align-middle">';
+                html += '<thead class="table-dark"><tr><th width="3%" class="text-center">No</th><th width="23%">Judul</th><th width="10%" class="text-center">Jenis</th><th width="15%">Instansi</th><th width="10%" class="text-center">Tanggal</th><th width="10%" class="text-center">Status</th><th width="10%" class="text-center">Dibuat</th><th width="12%" class="text-center">Aksi</th></tr></thead><tbody>';
+
+                reports.forEach((report, index) => {
+                    const jenisBadge = report.jenis_laporan === 'aduan' 
+                        ? '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Aduan</span>' 
+                        : '<span class="badge bg-info"><i class="bi bi-chat-dots"></i> Saran</span>';
+                    
+                    html += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td><strong>${report.title}</strong></td>
+                        <td class="text-center">${jenisBadge}</td>
+                        <td>${report.instansi_tujuan || '-'}</td>
+                        <td class="text-center">${formatDate(report.date)}</td>
+                        <td class="text-center"><span class="badge ${getStatusBadgeClass(report.status)}">${getStatusLabel(report.status)}</span></td>
+                        <td class="text-center">${formatDate(report.created_at)}</td>
+                        <td class="text-center">
+                            <a href="/report-detail.html?id=${report.id}" class="btn btn-sm btn-info" title="Lihat Detail">
+                                <i class="bi bi-eye"></i> Detail
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                
+                // Add summary
+                html += `<div class="mt-3 p-3 bg-light rounded">
+                    <p class="mb-0"><strong>Total Laporan:</strong> ${reports.length}</p>
+                </div>`;
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Failed to load reports:', error);
+                document.getElementById('reportsContainer').innerHTML = 
+                    '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Gagal memuat laporan</div>';
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            loadReports();
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterJenis').value = '';
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            loadReports();
+        }
+
+        // Initial load
+        loadReports();
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            loadReports();
+        }, 30000);
+    </script>
+</body>
+</html>

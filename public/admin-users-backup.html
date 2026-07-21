@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen User - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin-dashboard.html">
+                 <img src="assets/logo.jpg" alt="Logo WBS Diskominfo" class="logo" style="height: 50px;"> WBS Diskominfo - Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin-dashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin-users.html">
+                            <i class="bi bi-people"></i> Manajemen User
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin-reports.html">
+                            <i class="bi bi-file-text"></i> Laporan Pengaduan
+                        </a>
+                    </li>
+                    <li class="nav-item" style="display: none;">
+                        <span class="nav-link" id="adminName">Admin</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2><i class="bi bi-people"></i> Manajemen User</h2>
+                    <hr>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-people-fill"></i> Daftar User Terdaftar</h5>
+                            <button class="btn btn-primary" onclick="showAddUserModal()">
+                                <i class="bi bi-plus-circle"></i> Tambah User Baru
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="usersContainer">
+                                <!-- Users will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+        </div>
+    </footer>
+
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        if (user.role !== 'admin') {
+            window.location.href = '/user-dashboard.html';
+        }
+
+        // Display admin name
+        document.getElementById('adminName').textContent = user.name;
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const container = document.getElementById('usersContainer');
+                container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Memuat data user...</p></div>';
+
+                const data = await apiCall('/users');
+                
+                if (data.users.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-4">Belum ada user terdaftar</p>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-hover table-bordered">';
+                html += '<thead class="table-dark"><tr><th width="5%">No</th><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Terdaftar</th><th width="15%">Aksi</th></tr></thead><tbody>';
+
+                data.users.forEach((userItem, index) => {
+                    const isActive = userItem.is_active;
+                    const statusBadge = isActive 
+                        ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Aktif</span>' 
+                        : '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Nonaktif</span>';
+                    
+                    const roleBadge = userItem.role === 'admin'
+                        ? '<span class="badge bg-danger">Admin</span>'
+                        : '<span class="badge bg-primary">User</span>';
+                    
+                    const toggleButton = isActive
+                        ? `<button class="btn btn-sm btn-danger" onclick="toggleUserStatus(${userItem.id}, false)" title="Nonaktifkan User">
+                            <i class="bi bi-x-circle"></i> Nonaktifkan
+                           </button>`
+                        : `<button class="btn btn-sm btn-success" onclick="toggleUserStatus(${userItem.id}, true)" title="Aktifkan User">
+                            <i class="bi bi-check-circle"></i> Aktifkan
+                           </button>`;
+
+                    html += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td><i class="bi bi-person"></i> ${userItem.name}</td>
+                        <td><i class="bi bi-envelope"></i> ${userItem.email}</td>
+                        <td>${roleBadge}</td>
+                        <td>${statusBadge}</td>
+                        <td>${formatDate(userItem.created_at)}</td>
+                        <td>${toggleButton}</td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                
+                // Add summary
+                const activeCount = data.users.filter(u => u.is_active).length;
+                const inactiveCount = data.users.length - activeCount;
+                
+                html += `<div class="mt-3 p-3 bg-light rounded">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5>${data.users.length}</h5>
+                            <p class="text-muted mb-0">Total User</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-success">${activeCount}</h5>
+                            <p class="text-muted mb-0">User Aktif</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-secondary">${inactiveCount}</h5>
+                            <p class="text-muted mb-0">User Nonaktif</p>
+                        </div>
+                    </div>
+                </div>`;
+                
+                container.innerHTML = html;
+            } catch (error) {
+                showAlert('Gagal memuat user: ' + error.message, 'danger');
+                document.getElementById('usersContainer').innerHTML = 
+                    '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Gagal memuat data user</div>';
+            }
+        }
+
+        // Toggle user status
+        async function toggleUserStatus(userId, isActive) {
+            const action = isActive ? 'mengaktifkan' : 'menonaktifkan';
+            if (!confirm(`Apakah Anda yakin ingin ${action} user ini?`)) {
+                return;
+            }
+
+            try {
+                await apiCall(`/users/${userId}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                showAlert(`User berhasil ${isActive ? 'diaktifkan' : 'dinonaktifkan'}!`, 'success');
+                loadUsers();
+            } catch (error) {
+                showAlert('Gagal mengubah status user: ' + error.message, 'danger');
+            }
+        }
+
+        // Show Add User Modal
+        function showAddUserModal() {
+            const modal = `
+                <div class="modal fade" id="addUserModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title"><i class="bi bi-person-plus"></i> Tambah User Baru</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addUserForm">
+                                    <div class="mb-3">
+                                        <label for="userName" class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="userName" placeholder="Masukkan nama lengkap" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userEmail" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="userEmail" placeholder="contoh@email.com" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userPassword" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="userPassword" placeholder="Minimal 6 karakter" minlength="6" required>
+                                        <small class="text-muted">Password minimal 6 karakter</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="userRole" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="userRole" required>
+                                            <option value="">-- Pilih Role --</option>
+                                            <option value="user">User</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary" id="addUserBtn">
+                                            <i class="bi bi-check-circle"></i> Simpan User
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modal);
+            const modalElement = new bootstrap.Modal(document.getElementById('addUserModal'));
+            modalElement.show();
+
+            document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await addNewUser();
+            });
+
+            document.getElementById('addUserModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+            });
+        }
+
+        // Add new user
+        async function addNewUser() {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const role = document.getElementById('userRole').value;
+
+            if (!name || !email || !password || !role) {
+                showAlert('Semua field harus diisi!', 'warning');
+                return;
+            }
+
+            const addUserBtn = document.getElementById('addUserBtn');
+            addUserBtn.disabled = true;
+            addUserBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+
+            try {
+                await apiCall('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, email, password, role })
+                });
+
+                showAlert('User berhasil ditambahkan!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                loadUsers();
+            } catch (error) {
+                showAlert('Gagal menambah user: ' + error.message, 'danger');
+                addUserBtn.disabled = false;
+                addUserBtn.innerHTML = '<i class="bi bi-check-circle"></i> Simpan User';
+            }
+        }
+
+        // Initial load
+        loadUsers();
+
+        // Auto refresh every 60 seconds
+        setInterval(() => {
+            loadUsers();
+        }, 60000);
+    </script>
+</body>
+</html>

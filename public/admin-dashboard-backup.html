@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/admin-dashboard.html">
+                 <img src="assets/logo.jpg" alt="Logo WBS Diskominfo" class="logo" style="height: 50px;"> WBS Diskominfo - Admin
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin-dashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin-users.html">
+                            <i class="bi bi-people"></i> Manajemen User
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin-reports.html">
+                            <i class="bi bi-file-text"></i> Laporan Pengaduan
+                        </a>
+                    </li>
+                    <li class="nav-item" style="display: none;">
+                        <span class="nav-link" id="adminName"></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2><i class="bi bi-speedometer2"></i> Dashboard Admin</h2>
+                    <hr>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card stat-total">
+                        <h3 id="totalReports">0</h3>
+                        <p><i class="bi bi-file-earmark-text"></i> Total Laporan</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-pending">
+                        <h3 id="pendingReports">0</h3>
+                        <p><i class="bi bi-clock"></i> Menunggu</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-process">
+                        <h3 id="processReports">0</h3>
+                        <p><i class="bi bi-arrow-repeat"></i> Diproses</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card stat-done">
+                        <h3 id="doneReports">0</h3>
+                        <p><i class="bi bi-check-circle"></i> Selesai</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Grafik Laporan</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="text-center mb-2">
+                                        <h6>Laporan Berdasarkan Jenis</h6>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-center" style="height: 250px;">
+                                        <div style="max-width: 220px; width: 100%;">
+                                            <canvas id="jenisChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="text-center mb-2">
+                                        <h6>Laporan Berdasarkan Status</h6>
+                                    </div>
+                                    <div style="height: 250px;">
+                                        <canvas id="statusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest Reports -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> 5 Pengaduan Terbaru</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="latestReportsContainer">
+                                <!-- Latest reports will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        if (user.role !== 'admin') {
+            window.location.href = '/user-dashboard.html';
+        }
+
+        // Display admin name
+        document.getElementById('adminName').textContent = user.name;
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const data = await apiCall('/reports/admin/statistics/data');
+                const stats = data.statistics;
+
+                document.getElementById('totalReports').textContent = stats.totalReports;
+                document.getElementById('pendingReports').textContent = stats.pendingReports;
+                document.getElementById('processReports').textContent = stats.diprosesReports;
+                document.getElementById('doneReports').textContent = stats.selesaiReports;
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+            }
+        }
+
+        // Load chart data
+        async function loadChartData() {
+            try {
+                const response = await fetch('/api/reports/stats');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                // Jenis Chart
+                const jenisCanvas = document.getElementById('jenisChart');
+                if (data.byType && data.byType.length > 0) {
+                    const jenisLabels = data.byType.map(item => item.label);
+                    const jenisValues = data.byType.map(item => item.total);
+
+                    new Chart(jenisCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: jenisLabels,
+                            datasets: [{
+                                data: jenisValues,
+                                backgroundColor: [
+                                    'rgba(239, 68, 68, 0.8)',
+                                    'rgba(59, 130, 246, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgb(239, 68, 68)',
+                                    'rgb(59, 130, 246)'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            aspectRatio: 1.2,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 10,
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        },
+                                        generateLabels: function(chart) {
+                                            const data = chart.data;
+                                            if (data.labels.length && data.datasets.length) {
+                                                return data.labels.map((label, i) => {
+                                                    const value = data.datasets[0].data[i];
+                                                    return {
+                                                        text: label + ': ' + value,
+                                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                                        strokeStyle: data.datasets[0].borderColor[i],
+                                                        lineWidth: 2,
+                                                        hidden: false,
+                                                        index: i
+                                                    };
+                                                });
+                                            }
+                                            return [];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Status Chart
+                const statusCanvas = document.getElementById('statusChart');
+                if (data.byStatus && data.byStatus.length > 0) {
+                    const statusLabels = data.byStatus.map(item => item.label);
+                    const statusValues = data.byStatus.map(item => item.total);
+
+                    new Chart(statusCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: statusLabels,
+                            datasets: [{
+                                label: 'Jumlah Laporan',
+                                data: statusValues,
+                                backgroundColor: [
+                                    'rgba(96, 165, 250, 0.8)',
+                                    'rgba(59, 130, 246, 0.8)',
+                                    'rgba(30, 64, 175, 0.8)',
+                                    'rgba(147, 197, 253, 0.8)',
+                                    'rgba(30, 58, 138, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgb(96, 165, 250)',
+                                    'rgb(59, 130, 246)',
+                                    'rgb(30, 64, 175)',
+                                    'rgb(147, 197, 253)',
+                                    'rgb(30, 58, 138)'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1,
+                                        precision: 0,
+                                        font: {
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        font: {
+                                            size: 10
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load chart data:', error);
+            }
+        }
+
+        // Load latest 5 reports
+        async function loadLatestReports() {
+            try {
+                const container = document.getElementById('latestReportsContainer');
+                container.innerHTML = '<div class="text-center"><div class="spinner-border text-primary"></div></div>';
+
+                const data = await apiCall('/reports/admin/all?limit=5');
+                
+                if (data.reports.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">Belum ada laporan</p>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-hover">';
+                html += '<thead><tr><th>Judul</th><th>Jenis</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+
+                data.reports.forEach(report => {
+                    const jenisBadge = report.jenis_laporan === 'aduan' 
+                        ? '<span class="badge bg-danger">Aduan</span>' 
+                        : '<span class="badge bg-info">Saran</span>';
+                    
+                    html += `<tr>
+                        <td>${report.title}</td>
+                        <td>${jenisBadge}</td>
+                        <td>${formatDate(report.date)}</td>
+                        <td><span class="badge ${getStatusBadgeClass(report.status)}">${getStatusLabel(report.status)}</span></td>
+                        <td>
+                            <a href="/report-detail.html?id=${report.id}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Detail
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Failed to load latest reports:', error);
+                document.getElementById('latestReportsContainer').innerHTML = 
+                    '<p class="text-danger text-center">Gagal memuat laporan terbaru</p>';
+            }
+        }
+
+        // Initial load
+        loadStatistics();
+        loadChartData();
+        loadLatestReports();
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            loadStatistics();
+            loadLatestReports();
+        }, 30000);
+    </script>
+</body>
+</html>

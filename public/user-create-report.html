@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Laporan - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Dashboard Wrapper -->
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo.jpg" alt="Logo" onerror="this.style.display='none'">
+                <h3>WBS User</h3>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-label">Main Menu</div>
+                <a href="/user-dashboard.html" class="menu-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/user-create-report.html" class="menu-item active">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    <span>Buat Laporan</span>
+                </a>
+                <a href="/user-my-reports.html" class="menu-item">
+                    <i class="bi bi-list-ul"></i>
+                    <span>Laporan Saya</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <div class="menu-label">Account</div>
+                <a href="#" class="menu-item" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h2><i class="bi bi-file-earmark-plus"></i> Buat Laporan Baru</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName" style="display: none;"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="main-content-inner">
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-muted mb-4">Sampaikan pengaduan atau saran Anda untuk perbaikan layanan instansi</p>
+                    </div>
+                </div>
+
+                <!-- Create Report Form -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Form Laporan</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="reportForm">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label fw-semibold">Judul Laporan <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" placeholder="Ringkasan singkat laporan Anda" required>
+                                </div>
+                                
+                                <!-- Klasifikasi Laporan -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="jenis_laporan" class="form-label fw-semibold">Jenis Laporan <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="jenis_laporan" required>
+                                                <option value="">-- Pilih Jenis --</option>
+                                                <option value="aduan">Aduan</option>
+                                                <option value="saran">Saran</option>
+                                            </select>
+                                            <small class="text-muted">Pilih "Aduan" untuk pelanggaran, "Saran" untuk masukan</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="instansi_tujuan" class="form-label fw-semibold">Instansi Tujuan <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="instansi_tujuan" placeholder="Contoh: Dinas Komunikasi dan Informatika" required>
+                                            <small class="text-muted">Tulis nama instansi yang dituju</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="lokasi_kejadian" class="form-label fw-semibold">Lokasi Kejadian <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="lokasi_kejadian" placeholder="Contoh: Kantor Dinas Kominfo, Jl. Ahmad Yani No. 10" required>
+                                    <small class="text-muted">Sebutkan lokasi lengkap kejadian</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label fw-semibold">Deskripsi Lengkap <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="description" rows="6" placeholder="Jelaskan kronologi dan detail pelanggaran atau saran Anda..." required></textarea>
+                                    <small class="text-muted">Jelaskan kronologi dan detail pelanggaran yang terjadi</small>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="date" class="form-label fw-semibold">Tanggal Kejadian <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="date" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="file" class="form-label fw-semibold">File Bukti (Opsional)</label>
+                                            <input type="file" class="form-control" id="file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+                                            <small class="text-muted">Format: JPG, PNG, PDF, DOC (Max 5MB)</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informasi dan Pernyataan -->
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Ketentuan Pelaporan</h6>
+                                    <ul class="mb-0 small">
+                                        <li>Laporan yang Anda sampaikan akan dijaga kerahasiaannya</li>
+                                        <li>Pastikan informasi yang disampaikan akurat dan dapat dipertanggungjawabkan</li>
+                                        <li>Laporan palsu dapat dikenakan sanksi sesuai peraturan yang berlaku</li>
+                                        <li>Setiap laporan akan ditindaklanjuti maksimal 14 hari kerja</li>
+                                    </ul>
+                                </div>
+
+                                <div class="alert alert-warning">
+                                    <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Pernyataan Pelapor</h6>
+                                    <p class="mb-2 small">Dengan mencentang kotak di bawah ini, saya menyatakan bahwa:</p>
+                                    <ul class="mb-0 small">
+                                        <li>Informasi yang saya sampaikan adalah benar dan dapat dipertanggungjawabkan</li>
+                                        <li>Saya bersedia memberikan keterangan lebih lanjut jika diperlukan</li>
+                                        <li>Saya memahami konsekuensi hukum dari laporan palsu</li>
+                                    </ul>
+                                </div>
+
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="agreement" required>
+                                    <label class="form-check-label fw-bold" for="agreement">
+                                        Saya menyetujui pernyataan di atas dan bertanggung jawab atas kebenaran laporan ini <span class="text-danger">*</span>
+                                    </label>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="/user-dashboard.html" class="btn btn-secondary me-2">
+                                        <i class="bi bi-arrow-left"></i> Kembali
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                                        <i class="bi bi-send"></i> Kirim Laporan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer mt-5">
+                <div class="container-fluid">
+                    <p class="mb-0">&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        if (user.role === 'admin') {
+            window.location.href = '/admin-dashboard.html';
+        }
+
+        // Display user info
+        const userNameEl = document.getElementById('userName');
+        const userAvatarEl = document.getElementById('userAvatar');
+        if (userNameEl && user.name) {
+            userNameEl.textContent = user.name;
+            userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Submit report form
+        document.getElementById('reportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validasi checkbox agreement
+            if (!document.getElementById('agreement').checked) {
+                showAlert('Anda harus menyetujui pernyataan terlebih dahulu', 'warning');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('date', document.getElementById('date').value);
+            formData.append('jenis_laporan', document.getElementById('jenis_laporan').value);
+            formData.append('instansi_tujuan', document.getElementById('instansi_tujuan').value);
+            formData.append('lokasi_kejadian', document.getElementById('lokasi_kejadian').value);
+
+            const fileInput = document.getElementById('file');
+            if (fileInput.files[0]) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            try {
+                await apiCall('/reports', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {}
+                });
+
+                showAlert('Laporan berhasil dibuat!', 'success');
+                
+                // Redirect to dashboard after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/user-dashboard.html';
+                }, 2000);
+            } catch (error) {
+                showAlert('Gagal membuat laporan: ' + error.message, 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-send"></i> Kirim Laporan';
+            }
+        });
+
+        // Enable submit button when checkbox is checked
+        document.getElementById('agreement').addEventListener('change', function() {
+            document.getElementById('submitBtn').disabled = !this.checked;
+        });
+    </script>
+</body>
+</html>

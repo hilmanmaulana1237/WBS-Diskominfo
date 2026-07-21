@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Laporan - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/index.html">
+                <img src="assets/logo.jpg" alt="Logo WBS Diskominfo" class="logo" style="height: 50px;"> WBS Diskominfo
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="nav-link" id="userName">User</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="goBack()"><i class="bi bi-arrow-left"></i> Kembali</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="bi bi-file-earmark-text"></i> Detail Laporan</h2>
+                        <div id="actionButtons"></div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            <!-- Report Details -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informasi Laporan</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportDetails">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Description -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-card-text"></i> Deskripsi Lengkap</h5>
+                        </div>
+                        <div class="card-body">
+                            <p id="reportDescription" class="text-justify"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <!-- Reporter Info -->
+                    <div class="card mb-4" id="reporterInfoCard">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-person"></i> Informasi Pelapor</h5>
+                        </div>
+                        <div class="card-body" id="reporterInfo">
+                            <!-- Reporter info will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Status History -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Riwayat</h5>
+                        </div>
+                        <div class="card-body" id="historyInfo">
+                            <!-- History will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+        </div>
+    </footer>
+
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        const reportId = new URLSearchParams(window.location.search).get('id');
+
+        if (!reportId) {
+            showAlert('ID Laporan tidak ditemukan', 'danger');
+            setTimeout(() => goBack(), 2000);
+        }
+
+        // Display user name
+        document.getElementById('userName').textContent = user.name;
+
+        // Go back function
+        function goBack() {
+            if (user.role === 'admin') {
+                window.location.href = '/admin-dashboard.html';
+            } else {
+                window.location.href = '/user-dashboard.html';
+            }
+        }
+
+        // Load report detail
+        async function loadReportDetail() {
+            try {
+                const endpoint = user.role === 'admin' 
+                    ? `/reports/admin/${reportId}` 
+                    : `/reports/${reportId}`;
+                
+                const data = await apiCall(endpoint);
+                const report = data.report;
+
+                // Render report details
+                const detailsHtml = `
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="40%">ID Laporan:</th>
+                            <td><strong>#${report.id}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Judul:</th>
+                            <td><strong>${report.title}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Jenis Laporan:</th>
+                            <td><span class="badge ${report.jenis_laporan === 'aduan' ? 'bg-danger' : 'bg-info'}">${report.jenis_laporan === 'aduan' ? 'Aduan' : 'Saran'}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Instansi Tujuan:</th>
+                            <td>${report.instansi_tujuan || 'Tidak disebutkan'}</td>
+                        </tr>
+                        <tr>
+                            <th>Lokasi Kejadian:</th>
+                            <td><i class="bi bi-geo-alt"></i> ${report.lokasi_kejadian || 'Tidak disebutkan'}</td>
+                        </tr>
+                        <tr>
+                            <th>Tanggal Kejadian:</th>
+                            <td>${formatDate(report.date)}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge ${getStatusBadgeClass(report.status)} fs-6">${getStatusLabel(report.status)}</span></td>
+                        </tr>
+                        <tr>
+                            <th>File Bukti:</th>
+                            <td>${report.file_path ? `<a href="/${report.file_path}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i> Download File</a>` : '<span class="text-muted">Tidak ada file</span>'}</td>
+                        </tr>
+                    </table>
+                `;
+                document.getElementById('reportDetails').innerHTML = detailsHtml;
+
+                // Render description
+                document.getElementById('reportDescription').innerHTML = report.description.replace(/\n/g, '<br>');
+
+                // Render reporter info (only for admin)
+                if (user.role === 'admin') {
+                    const reporterHtml = `
+                        <p class="mb-1"><strong>Nama:</strong></p>
+                        <p class="mb-3">${report.user_name}</p>
+                        <p class="mb-1"><strong>Email:</strong></p>
+                        <p class="mb-0">${report.user_email}</p>
+                    `;
+                    document.getElementById('reporterInfo').innerHTML = reporterHtml;
+                } else {
+                    document.getElementById('reporterInfoCard').style.display = 'none';
+                }
+
+                // Render history
+                const historyHtml = `
+                    <p class="mb-1"><strong>Dibuat:</strong></p>
+                    <p class="mb-3 small">${formatDate(report.created_at)}</p>
+                    <p class="mb-1"><strong>Terakhir Update:</strong></p>
+                    <p class="mb-0 small">${formatDate(report.updated_at)}</p>
+                `;
+                document.getElementById('historyInfo').innerHTML = historyHtml;
+
+                // Action buttons
+                let actionHtml = '';
+                if (user.role === 'admin') {
+                    actionHtml = `
+                        <button class="btn btn-warning" onclick="updateStatus()">
+                            <i class="bi bi-pencil"></i> Update Status
+                        </button>
+                        <button class="btn btn-success" onclick="exportPDF()">
+                            <i class="bi bi-file-pdf"></i> Export PDF
+                        </button>
+                        <button class="btn btn-info" onclick="exportCSV()">
+                            <i class="bi bi-file-spreadsheet"></i> Export CSV
+                        </button>
+                    `;
+                } else {
+                    actionHtml = `
+                        <button class="btn btn-success" onclick="exportPDF()">
+                            <i class="bi bi-file-pdf"></i> Export PDF
+                        </button>
+                    `;
+                }
+                document.getElementById('actionButtons').innerHTML = actionHtml;
+
+            } catch (error) {
+                showAlert('Gagal memuat detail laporan: ' + error.message, 'danger');
+                document.getElementById('reportDetails').innerHTML = '<p class="text-danger">Gagal memuat data</p>';
+            }
+        }
+
+        // Update status function (admin only)
+        async function updateStatus() {
+            const modal = `
+                <div class="modal fade" id="statusModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Update Status Laporan</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="statusForm">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Pilih Status</label>
+                                        <select class="form-select" id="status" required>
+                                            <option value="pending">Menunggu</option>
+                                            <option value="diterima">Diterima</option>
+                                            <option value="diproses">Diproses</option>
+                                            <option value="selesai">Selesai</option>
+                                            <option value="ditolak">Ditolak</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-check"></i> Update Status
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modal);
+            const modalElement = new bootstrap.Modal(document.getElementById('statusModal'));
+            modalElement.show();
+
+            document.getElementById('statusForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const status = document.getElementById('status').value;
+
+                try {
+                    await apiCall(`/reports/admin/${reportId}/status`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ status })
+                    });
+
+                    showAlert('Status berhasil diupdate!', 'success');
+                    modalElement.hide();
+                    loadReportDetail();
+                } catch (error) {
+                    showAlert('Gagal update status: ' + error.message, 'danger');
+                }
+            });
+
+            document.getElementById('statusModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
+            });
+        }
+
+        // Export functions (placeholder for now)
+        function exportPDF() {
+            downloadFile(`${API_URL}/reports/${reportId}/export/pdf`, `laporan-${reportId}.pdf`);
+        }
+
+        function exportCSV() {
+            if (user.role === 'admin') {
+                downloadFile(`${API_URL}/reports/export/csv`, `laporan-all-${Date.now()}.csv`);
+            } else {
+                showAlert('Fitur export CSV hanya tersedia untuk admin', 'warning');
+            }
+        }
+
+        // Initial load
+        loadReportDetail();
+    </script>
+</body>
+</html>

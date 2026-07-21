@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - WBS Diskominfo</title>
+    <link href="/assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Dashboard Wrapper -->
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo.jpg" alt="Logo" onerror="this.style.display='none'">
+                <h3>WBS Admin</h3>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-label">Main Menu</div>
+                <a href="/admin-dashboard.html" class="menu-item active">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin-reports.html" class="menu-item">
+                    <i class="bi bi-file-text"></i>
+                    <span>Laporan Pengaduan</span>
+                </a>
+                <a href="/admin-users.html" class="menu-item">
+                    <i class="bi bi-people"></i>
+                    <span>Manajemen User</span>
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <div class="menu-label">Account</div>
+                <a href="#" class="menu-item" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h2><i class="bi bi-speedometer2"></i> Dashboard Admin</h2>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <span id="adminName" style="display: none;"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="main-content-inner">
+                <!-- Statistics -->
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card stat-total">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <h3 id="totalReports">0</h3>
+                            <p>Total Laporan</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card stat-pending">
+                            <i class="bi bi-clock"></i>
+                            <h3 id="pendingReports">0</h3>
+                            <p>Menunggu</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card stat-process">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <h3 id="processReports">0</h3>
+                            <p>Diproses</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card stat-done">
+                            <i class="bi bi-check-circle"></i>
+                            <h3 id="doneReports">0</h3>
+                            <p>Selesai</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Grafik Laporan</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-6 mb-4">
+                                        <h6 class="text-center mb-3">Laporan Berdasarkan Jenis</h6>
+                                        <div class="chart-container" style="max-height: 300px;">
+                                            <canvas id="jenisChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mb-4">
+                                        <h6 class="text-center mb-3">Laporan Berdasarkan Status</h6>
+                                        <div class="chart-container" style="max-height: 300px;">
+                                            <canvas id="statusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Reports -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Laporan Terbaru</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="recentReportsContainer">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary"></div>
+                                        <p class="mt-2">Memuat data laporan...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer mt-5">
+                <div class="container-fluid">
+                    <p class="mb-0">&copy; 2026 Whistle Blowing System - Dinas Komunikasi dan Informatika</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Check authentication
+        if (!isLoggedIn()) {
+            window.location.href = '/login.html';
+        }
+
+        const user = getUser();
+        if (user.role !== 'admin') {
+            window.location.href = '/user-dashboard.html';
+        }
+
+        // Display admin info
+        const adminNameEl = document.getElementById('adminName');
+        const userAvatarEl = document.getElementById('userAvatar');
+        if (adminNameEl && user.name) {
+            adminNameEl.textContent = user.name;
+            userAvatarEl.textContent = user.name.charAt(0).toUpperCase();
+        }
+
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Load Statistics
+        async function loadStats() {
+            try {
+                const data = await apiCall('/reports/stats');
+                
+                document.getElementById('totalReports').textContent = data.total || 0;
+                document.getElementById('pendingReports').textContent = data.pending || 0;
+                document.getElementById('processReports').textContent = data.diproses || 0;
+                document.getElementById('doneReports').textContent = data.selesai || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load Charts with Animation
+        async function loadCharts() {
+            try {
+                const data = await apiCall('/reports/charts');
+
+                // Jenis Chart (Doughnut)
+                const jenisCtx = document.getElementById('jenisChart');
+                if (jenisCtx && data.jenis) {
+                    new Chart(jenisCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.jenis.map(item => item.jenis_laporan || 'Tidak Ada'),
+                            datasets: [{
+                                data: data.jenis.map(item => item.count),
+                                backgroundColor: [
+                                    'rgba(66, 153, 225, 0.8)',
+                                    'rgba(245, 158, 11, 0.8)',
+                                    'rgba(139, 92, 246, 0.8)'
+                                ],
+                                borderColor: [
+                                    'rgba(66, 153, 225, 1)',
+                                    'rgba(245, 158, 11, 1)',
+                                    'rgba(139, 92, 246, 1)'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 15,
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': ' + context.parsed + ' laporan';
+                                        }
+                                    }
+                                }
+                            },
+                            animation: {
+                                animateScale: true,
+                                animateRotate: true,
+                                duration: 1500,
+                                easing: 'easeInOutQuart'
+                            },
+                            onHover: (event, activeElements) => {
+                                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                            }
+                        }
+                    });
+                }
+
+                // Status Chart (Bar)
+                const statusCtx = document.getElementById('statusChart');
+                if (statusCtx && data.status) {
+                    new Chart(statusCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.status.map(item => item.status),
+                            datasets: [{
+                                label: 'Jumlah Laporan',
+                                data: data.status.map(item => item.count),
+                                backgroundColor: [
+                                    'rgba(245, 158, 11, 0.7)',
+                                    'rgba(66, 153, 225, 0.7)',
+                                    'rgba(139, 92, 246, 0.7)',
+                                    'rgba(16, 185, 129, 0.7)',
+                                    'rgba(239, 68, 68, 0.7)'
+                                ],
+                                borderColor: [
+                                    'rgba(245, 158, 11, 1)',
+                                    'rgba(66, 153, 225, 1)',
+                                    'rgba(139, 92, 246, 1)',
+                                    'rgba(16, 185, 129, 1)',
+                                    'rgba(239, 68, 68, 1)'
+                                ],
+                                borderWidth: 2,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Jumlah: ' + context.parsed.y + ' laporan';
+                                        }
+                                    }
+                                }
+                            },
+                            animation: {
+                                duration: 1500,
+                                easing: 'easeInOutQuart',
+                                delay: (context) => {
+                                    let delay = 0;
+                                    if (context.type === 'data' && context.mode === 'default') {
+                                        delay = context.dataIndex * 200;
+                                    }
+                                    return delay;
+                                }
+                            },
+                            onHover: (event, activeElements, chart) => {
+                                if (activeElements.length > 0) {
+                                    event.native.target.style.cursor = 'pointer';
+                                    const index = activeElements[0].index;
+                                    chart.data.datasets[0].backgroundColor = chart.data.datasets[0].backgroundColor.map((color, i) => {
+                                        return i === index ? color.replace('0.7', '1') : color.replace('1', '0.7');
+                                    });
+                                    chart.update('none');
+                                } else {
+                                    event.native.target.style.cursor = 'default';
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading charts:', error);
+            }
+        }
+
+        // Load Recent Reports
+        async function loadRecentReports() {
+            try {
+                const data = await apiCall('/reports/admin/all');
+                const container = document.getElementById('recentReportsContainer');
+
+                if (!data.reports || data.reports.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center py-4">Belum ada laporan</p>';
+                    return;
+                }
+
+                let html = '<div class="table-responsive"><table class="table table-hover">';
+                html += '<thead><tr><th>No</th><th>Judul</th><th>Pelapor</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+
+                data.reports.slice(0, 5).forEach((report, index) => {
+                    const statusBadge = getStatusBadge(report.status);
+                    html += `<tr>
+                        <td>${index + 1}</td>
+                        <td>${report.title}</td>
+                        <td>${report.user_name}</td>
+                        <td>${formatDate(report.date)}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <a href="/report-detail.html?id=${report.id}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> Detail
+                            </a>
+                        </td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading recent reports:', error);
+                document.getElementById('recentReportsContainer').innerHTML = 
+                    '<div class="alert alert-danger">Gagal memuat data laporan</div>';
+            }
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': '<span class="badge bg-warning">Pending</span>',
+                'diterima': '<span class="badge bg-primary">Diterima</span>',
+                'diproses': '<span class="badge bg-info">Diproses</span>',
+                'selesai': '<span class="badge bg-success">Selesai</span>',
+                'ditolak': '<span class="badge bg-danger">Ditolak</span>'
+            };
+            return badges[status] || '<span class="badge bg-secondary">' + status + '</span>';
+        }
+
+        // Initialize
+        loadStats();
+        loadCharts();
+        loadRecentReports();
+
+        // Auto refresh every 30 seconds
+        setInterval(() => {
+            loadStats();
+            loadRecentReports();
+        }, 30000);
+    </script>
+</body>
+</html>

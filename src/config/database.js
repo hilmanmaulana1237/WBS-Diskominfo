@@ -73,6 +73,29 @@ const mockDb = {
             const user = mockUsers.find(u => u.id === params[0]);
             return [user ? [user] : []];
         }
+        
+        // GET ALL USERS (Admin)
+        if (sqlLower.includes('from users where role = "user"')) {
+            let filteredUsers = mockUsers.filter(u => u.role === 'user');
+            filteredUsers.sort((a, b) => b.created_at - a.created_at);
+            return [filteredUsers];
+        }
+
+        // TOGGLE USER STATUS
+        if (sqlLower.includes('update users set is_active')) {
+            const user = mockUsers.find(u => u.id === params[1]);
+            if (user) {
+                user.is_active = params[0];
+                return [{ affectedRows: 1 }];
+            }
+            return [{ affectedRows: 0 }];
+        }
+        
+        // GET USER ROLE
+        if (sqlLower.includes('select role from users where id')) {
+            const user = mockUsers.find(u => u.id === params[0]);
+            return [user ? [user] : []];
+        }
 
         // REPORTS
         if (sqlLower.includes('insert into reports')) {

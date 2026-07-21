@@ -35,6 +35,58 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// TEMPORARY DB SETUP ROUTE
+app.get('/api/setup-database', async (req, res) => {
+    try {
+        const pool = require('./config/database');
+        
+        await pool.query('DROP TABLE IF EXISTS reports;');
+        await pool.query('DROP TABLE IF EXISTS users;');
+
+        await pool.query(`
+            CREATE TABLE users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                role ENUM('user', 'admin') DEFAULT 'user',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE reports (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                date DATE NOT NULL,
+                status ENUM('pending', 'diterima', 'diproses', 'selesai', 'ditolak') DEFAULT 'pending',
+                file_path VARCHAR(500),
+                user_id INT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+        `);
+
+        await pool.query(`
+            INSERT INTO users (name, email, password, role) VALUES 
+            ('Admin WBS', 'admin@diskominfo.go.id', '$2a$10$rOZ7VH9YYVOVJqxmYWQp/uXNlH9vC5XGJ4YqN6Qd7nqHZBK/Wm8qK', 'admin'),
+            ('Budi Santoso', 'budi@email.com', '$2a$10$rOZ7VH9YYVOVJqxmYWQp/uXNlH9vC5XGJ4YqN6Qd7nqHZBK/Wm8qK', 'user');
+        `);
+
+        await pool.query(`
+            INSERT INTO reports (title, description, date, status, user_id) VALUES 
+            ('Dugaan Penyalahgunaan Anggaran', 'Indikasi penyalahgunaan anggaran.', '2026-01-15', 'diproses', 2);
+        `);
+
+        res.send('<h1>✅ Database berhasil di-setup! Silakan kembali ke halaman utama dan coba login.</h1>');
+    } catch (error) {
+        res.send('<h1>❌ Gagal setup database: ' + error.message + '</h1>');
+    }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

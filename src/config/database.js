@@ -15,9 +15,9 @@ const dbConfig = {
     queueLimit: 0
 };
 
-if (process.env.DB_SSL === 'true' && process.env.DB_CA_CERT) {
+if (process.env.DB_SSL === 'true') {
     dbConfig.ssl = {
-        ca: fs.readFileSync(path.join(process.cwd(), process.env.DB_CA_CERT))
+        ca: fs.readFileSync(path.join(__dirname, '../../aiven-ca.pem'))
     };
 }
 

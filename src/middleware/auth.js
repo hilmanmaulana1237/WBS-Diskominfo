@@ -8,7 +8,7 @@ const auth = (req, res, next) => {
             return res.status(401).json({ error: 'Akses ditolak. Token tidak ditemukan.' });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key_123');
         req.user = decoded;
         next();
     } catch (error) {

@@ -1,5 +1,5 @@
 let users = [
-    { id: 1, name: 'Admin WBS', email: 'admin@diskominfo.go.id', password: '$2a$10$rOZ7VH9YYVOVJqxmYWQp/uXNlH9vC5XGJ4YqN6Qd7nqHZBK/Wm8qK', role: 'admin', is_active: 1, created_at: new Date() },
+    { id: 1, name: 'Admin WBS', email: 'admin@diskominfo.go.id', password: '$2a$10$2iLZj9Oxco7YSjssFqMK/./iQ.foeAcSDcNZvFGkB7ioKMk66PgHK', role: 'admin', is_active: 1, created_at: new Date() },
     { id: 2, name: 'Budi Santoso', email: 'budi@email.com', password: '$2a$10$rOZ7VH9YYVOVJqxmYWQp/uXNlH9vC5XGJ4YqN6Qd7nqHZBK/Wm8qK', role: 'user', is_active: 1, created_at: new Date() }
 ];
 
